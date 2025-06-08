@@ -7,6 +7,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@solana/web3.js": "^1.98.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
