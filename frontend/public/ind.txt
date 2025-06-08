@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NRG AI Crypto Predictor</title>
+
+    <!-- ✅ Meta SEO + Branding -->
+    <meta name="description" content="NRG AI Crypto Predictor - Predict tomorrow’s crypto prices with cutting-edge LSTM AI." />
+    <meta name="theme-color" content="#111111" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f5f6fa" media="(prefers-color-scheme: light)" />
+
+    <!-- ✅ Custom Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon-v2.svg" />
+    <!-- Alternativ pentru .ico -->
+    <link rel="icon" type="image/x-icon" href="/favicon-v2.ico" />
+
+    <!-- ✅ Dark mode support -->
+    <meta name="color-scheme" content="dark light" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+

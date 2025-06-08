@@ -1,0 +1,11 @@
+<!-- src/logo.svg -->
+<svg width="120" height="40" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .text { font: bold 22px 'Segoe UI', sans-serif; fill: #ffffff; }
+    .accent { fill: #6c5ce7; }
+    .bg { fill: #111; }
+  </style>
+  <rect class="bg" width="200" height="60" rx="10" />
+  <circle class="accent" cx="30" cy="30" r="20" />
+  <text x="60" y="37" class="text">NRG Predict</text>
+</svg>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Neurogen AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    .container {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      max-width: 700px;
+      width: 100%;
+    }
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: none;
+      background: #1e1e2f;
+      color: white;
+      cursor: pointer;
+    }
+    select:disabled, button:disabled {
+      background: #555;
+      cursor: not-allowed;
+    }
+    #result {
+      margin-top: 20px;
+      background: #2a2a40;
+      padding: 15px;
+      border-radius: 6px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .prediction-entry {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 8px;
+    }
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+    #chartContainer {
+      margin-top: 30px;
+    }
+    .buy-message {
+      margin-top: 20px;
+      padding: 15px;
+      background: #222;
+      border-radius: 8px;
+      font-size: 16px;
+      line-height: 1.4;
+    }
+    .buy-message button {
+      margin-top: 10px;
+      background: gold;
+      color: black;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/static/images/NeuroGen.png" alt="Neurogen AI Logo" class="logo" />
+    <h1>Welcome to Neurogen AI</h1>
+    <p>Generate a possible price prediction for your selected asset</p>
+
+    <label for="symbol">Choose an asset:</label>
+    <select id="symbol"></select>
+
+    <label for="days">Prediction range (days):</label>
+    <select id="days">
+      <option value="1">1 day</option>
+      <option value="2">2 days</option>
+      <option value="3">3 days</option>
+      <option value="4">4 days</option>
+      <option value="5">5 days</option>
+    </select>
+
+    <button id="predictBtn" onclick="getPrediction()">Generate Prediction (LSTM PRO)</button>
+
+    <div id="result"></div>
+
+    <div id="chartContainer">
+      <canvas id="predictionChart" width="400" height="200"></canvas>
+    </div>
+
+    <div id="buySection" class="buy-message" style="display:none;">
+      <div>
+        You’ve reached your free prediction limit.<br><br>
+        Upgrade for more predictions:<br>
+        🔓 2 predictions – 500 NRG<br>
+        🔓 100 predictions – 5000 NRG<br>
+        🔓 Unlimited predictions – 10000 NRG<br>
+        <button onclick="buyNow()">Buy now for more predictions</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let chart;
+  let freePredictionsLeft = 1;
+  window.buyLink = null;
+
+  async function loadSymbols() {
+  const symbolDropdown = document.getElementById('symbol');
+  try {
+    const response = await fetch('/symbols');
+    const data = await response.json();
+    console.log("Symbols data:", data);  // <-- adaugă asta temporar
+
+    data.symbols.forEach(symbol => {
+      const opt = document.createElement('option');
+      opt.value = symbol;
+      opt.textContent = symbol.toUpperCase();
+      symbolDropdown.appendChild(opt);
+    });
+  } catch (error) {
+    console.error('Error loading symbols:', error);
+    alert("Failed to load symbols.");
+  }
+}
+
+  async function getPrediction() {
+    const symbol = document.getElementById('symbol').value.toLowerCase();
+    const days = parseInt(document.getElementById('days').value);
+    const resultBox = document.getElementById('result');
+    const ctx = document.getElementById('predictionChart').getContext('2d');
+    const buySection = document.getElementById('buySection');
+    const predictBtn = document.getElementById('predictBtn');
+
+    if (freePredictionsLeft <= 0) {
+      buySection.style.display = 'block';
+      predictBtn.disabled = true;
+      resultBox.innerHTML = "🔒 You have no free predictions left.";
+      return;
+    } else {
+      buySection.style.display = 'none';
+      predictBtn.disabled = false;
+    }
+
+    resultBox.innerHTML = '⏳ Loading...';
+
+    try {
+      const response = await fetch('/predict-lstm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ symbol, days })
+      });
+
+      if (!response.ok) throw new Error("Prediction fetch failed");
+
+      const predictionData = await response.json();
+
+      freePredictionsLeft = predictionData.free_predictions_left ?? freePredictionsLeft;
+      window.buyLink = predictionData.buy_link ?? null;
+
+      if (freePredictionsLeft <= 0) {
+        buySection.style.display = 'block';
+        predictBtn.disabled = true;
+      }
+
+      let html = `<strong>Asset:</strong> ${predictionData.symbol.toUpperCase()}<br><br>`;
+
+      if (predictionData.prediction.length === 0) {
+        html += "<i>No prediction data available.</i>";
+        resultBox.innerHTML = html;
+        if (chart) chart.destroy();
+        return;
+      }
+
+      predictionData.prediction.forEach(p => {
+        html += `
+          <div class="prediction-entry">
+            <strong>Date:</strong> ${p.date}<br>
+            <strong>Predicted Price:</strong> $${p.predicted_price.toFixed(2)}<br>
+            <strong>Real Price:</strong> ${p.real_price !== null ? '$' + p.real_price.toFixed(2) : 'N/A'}
+          </div>
+        `;
+      });
+
+      resultBox.innerHTML = html;
+
+      const labels = predictionData.prediction.map(p => p.date);
+      const predicted = predictionData.prediction.map(p => p.predicted_price);
+      const real = predictionData.prediction.map(p => p.real_price);
+
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Predicted Price',
+              data: predicted,
+              borderColor: 'gold',
+              backgroundColor: 'rgba(255, 215, 0, 0.2)',
+              borderWidth: 2,
+              tension: 0.3
+            },
+            {
+              label: 'Real Price',
+              data: real,
+              borderColor: 'lightblue',
+              backgroundColor: 'rgba(173, 216, 230, 0.2)',
+              borderWidth: 2,
+              tension: 0.3
+            }
+          ]
+        },
+        options: {
+          scales: {
+            x: { title: { display: true, text: 'Date' } },
+            y: { title: { display: true, text: 'Price (USD)' }, beginAtZero: false }
+          }
+        }
+      });
+
+    } catch (err) {
+      console.error(err);
+      resultBox.innerHTML = '❌ Error fetching prediction. Please try again.';
+    }
+  }
+
+  function buyNow() {
+    const buyLink = window.buyLink || 'https://dexscreener.com/solana/3uamdkk3c9t1eabzhbpg1fzakrf32zam3pgb6yvhvn7e';
+    window.open(buyLink, '_blank');
+  }
+
+  window.onload = loadSymbols;
+</script>
+</body>
+</html>

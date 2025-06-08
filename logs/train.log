@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/NRG_Live/NRG/train_daily.py", line 3, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+Traceback (most recent call last):
+  File "/home/NRG_Live/NRG/train_daily.py", line 3, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
+✅ Cron test at Fri Jun  6 20:11:04 EEST 2025
+Traceback (most recent call last):
+  File "/home/NRG_Live/NRG/train_daily.py", line 3, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'

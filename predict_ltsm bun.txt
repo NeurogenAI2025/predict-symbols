@@ -1,0 +1,101 @@
+from sklearn.preprocessing import MinMaxScaler
+from fastapi import HTTPException
+import pandas as pd
+import numpy as np
+import joblib
+import pandas_ta as ta
+from tensorflow.keras.models import load_model
+from pathlib import Path
+from datetime import datetime, timedelta
+import os
+import traceback
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+BASE_DIR = Path(__file__).parent
+MODELS_DIR = BASE_DIR / "models"
+SCALERS_DIR = BASE_DIR / "scalers"
+DATA_DIR = BASE_DIR / "data"
+
+def compute_rsi(series, period=14):
+    delta = series.diff()
+    gain = np.where(delta > 0, delta, 0)
+    loss = np.where(delta < 0, -delta, 0)
+    avg_gain = pd.Series(gain).rolling(window=period).mean()
+    avg_loss = pd.Series(loss).rolling(window=period).mean()
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+
+def predict(symbol: str, wallet: str, days: int):
+    symbol = symbol.lower()
+    wallet = wallet.lower()
+
+    model_path = MODELS_DIR / f"{symbol}_lstm_model.keras"
+    scaler_path = SCALERS_DIR / f"{symbol}_lstm_scaler.save"
+    data_path = DATA_DIR / f"{symbol}.csv"
+
+    if not model_path.exists() or not scaler_path.exists() or not data_path.exists():
+        raise HTTPException(status_code=404, detail="Missing model, scaler or data files for symbol.")
+
+    try:
+        model = load_model(model_path, compile=False)
+        scaler = joblib.load(scaler_path)
+        df = pd.read_csv(data_path)
+
+        if 'price' not in df.columns:
+            if 'close' in df.columns:
+                df['price'] = df['close']
+            elif 'Close' in df.columns:
+                df['price'] = df['Close']
+            else:
+                raise HTTPException(status_code=400, detail="'price' column not found in data.")
+
+        if 'timestamp' not in df.columns:
+            df['timestamp'] = pd.date_range(end=datetime.today(), periods=len(df)).astype(str)
+
+        df['sma_10'] = df['price'].rolling(window=10).mean()
+        df['sma_50'] = df['price'].rolling(window=50).mean()
+        df['rsi_14'] = compute_rsi(df['price'], 14)
+        try:
+            macd = ta.macd(df['price'], fast=12, slow=26, signal=9)
+            df['macd_hist'] = macd['MACDh_12_26_9']
+        except:
+            df['macd_hist'] = 0
+        df['volatility'] = df['price'].pct_change().rolling(window=20).std()
+
+        df = df.dropna().reset_index(drop=True)
+        features = ["price", "sma_10", "sma_50", "rsi_14", "macd_hist", "volatility"]
+        data = df[features].values
+        scaled_data = scaler.transform(data)
+        lookback = 30
+        if len(scaled_data) < lookback:
+            raise HTTPException(status_code=400, detail=f"Not enough data. Need {lookback} rows.")
+
+        last_sequence = scaled_data[-lookback:]
+        predictions = []
+
+        for i in range(days):
+            input_seq = np.reshape(last_sequence, (1, lookback, len(features)))
+            pred_scaled = model.predict(input_seq, verbose=0)[0][0]
+
+            last_day = last_sequence[-1].copy()
+            last_day[0] = pred_scaled
+            inv_scaled = scaler.inverse_transform([last_day])[0]
+            predicted_price = inv_scaled[0]
+
+            new_scaled_row = last_sequence[-1].copy()
+            new_scaled_row[0] = pred_scaled
+            last_sequence = np.vstack([last_sequence[1:], new_scaled_row])
+
+            pred_date = (datetime.today() + timedelta(days=i+1)).strftime("%Y-%m-%d")
+
+            predictions.append({
+                "timestamp": pred_date,
+                "Predicted_Price": round(predicted_price, 2)
+            })
+
+        return predictions
+
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))

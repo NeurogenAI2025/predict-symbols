@@ -1,0 +1,197 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f6fa;
+  color: #111;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+header {
+  background: #111;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.7rem;
+  letter-spacing: 1px;
+}
+
+header button {
+  background: #6c5ce7;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  font-weight: bold;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.3s ease;
+}
+
+header button:hover {
+  background: #5a4cd2;
+}
+
+main {
+  padding: 2rem;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.predict-box {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.predict-box select,
+.predict-box input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 1rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.predict-box button {
+  margin-top: 1.5rem;
+  width: 100%;
+  padding: 12px;
+  background: #00cec9;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.predict-box button:hover {
+  background: #00b7b3;
+}
+
+.result pre {
+  background: #ecf0f1;
+  padding: 1.2rem;
+  margin-top: 1rem;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.buy-menu {
+  background: #ffeaa7;
+  padding: 1.5rem;
+  border-radius: 14px;
+  box-shadow: 0 0 8px rgba(255, 206, 84, 0.3);
+}
+
+.plans {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.plan-button {
+  flex: 1;
+  min-width: 180px;
+  padding: 12px 20px;
+  background: #fd79a8;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.plan-button:hover {
+  background: #e05694;
+}
+
+.payment-status {
+  margin-top: 1rem;
+  font-weight: bold;
+  color: #2d3436;
+}
+
+/* ✅ Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #0e0e0e;
+    color: #eee;
+  }
+
+  .predict-box {
+    background: #1f1f1f;
+    color: #fff;
+  }
+
+  .predict-box select,
+  .predict-box input {
+    background: #2a2a2a;
+    color: #fff;
+    border: 1px solid #555;
+  }
+
+  .predict-box button {
+    background: #00b7b3;
+  }
+
+  .result pre {
+    background: #2e2e2e;
+    color: #eee;
+  }
+
+  .buy-menu {
+    background: #2d2d2d;
+    color: #fff;
+  }
+
+  .plan-button {
+    background: #d63031;
+  }
+
+  .payment-status {
+    color: #dfe6e9;
+  }
+
+  header {
+    background: #000;
+    color: #fff;
+  }
+
+  header button {
+    background: #8e44ad;
+  }
+
+  header button:hover {
+    background: #6c3483;
+  }
+}
+
+
