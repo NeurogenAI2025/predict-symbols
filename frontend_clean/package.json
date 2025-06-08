@@ -13,6 +13,9 @@
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
-    "@vitejs/plugin-react": "^4.5.1"
+    "@vitejs/plugin-react": "^4.5.1",
+    "buffer": "^6.0.3",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "stream-browserify": "^3.0.0"
   }
 }
