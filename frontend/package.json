@@ -5,7 +5,7 @@
     "dev": "vite",
     "build": "vite build"
   },
-  "devDependencies": {
-    "vite": "^6.3.5"
+ "dependencies": {
+  "vite": "^6.3.5"
   }
 }
