@@ -7,3 +7,5 @@ __pycache__/
 *.pyd
 *.pyc
 tfenv310/
+owner_secret_key.py
+.env
