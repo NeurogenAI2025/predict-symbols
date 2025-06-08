@@ -6,21 +6,38 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-tfenv310/
-node_modules
-dist
-dist-ssr
-*.local
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# System-specific
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+.env
+.venv/
+env/
+venv/
+*.sqlite3
+
+# Vite / Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# Tensorflow / JAX heavy files
 tfenv310/
-tfenv310/
+
+# VSCode / IDE
+.vscode/
+!.vscode/extensions.json
+.idea/
