@@ -1,3 +1,4 @@
+// App.jsx
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import {
@@ -7,9 +8,9 @@ import {
   Transaction,
 } from '@solana/web3.js';
 import PhantomLogo from './Phantom.svg';
-import NrgLogo from './assets/nrg-logo.svg'; // ✅ nou
+import NrgLogo from './assets/nrg-logo.svg';
 
-const API_URL = "https://predict-backend-kgzm.onrender.com"; // 🔁 NOU
+const API_URL = "https://predict-backend-kgzm.onrender.com";
 
 const App = () => {
   const [wallet, setWallet] = useState(null);
@@ -27,7 +28,6 @@ const App = () => {
       .then(res => res.json())
       .then(data => {
         setAvailableSymbols(data.symbols);
-        console.log("🔁 Symbols from backend:", data.symbols);
         document.title = "NRG AI Crypto Predictor";
       })
       .catch(err => {
@@ -216,3 +216,4 @@ const App = () => {
 };
 
 export default App;
+
