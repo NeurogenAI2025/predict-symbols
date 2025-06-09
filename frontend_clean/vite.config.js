@@ -1,15 +1,31 @@
-kimport { defineConfig } from 'vite';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: ['@solana/web3.js'], // 👉 spune Vite să preproceseze acest modul
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+      plugins: [
+        NodeGlobalsPolyfillPlugin({
+          buffer: true,
+          process: true,
+        }),
+      ],
+    },
+    include: ['@solana/web3.js', 'buffer', 'process', 'stream'],
   },
-  build: {
-    rollupOptions: {
-      external: ['@solana/web3.js'], // 👉 împiedică Rollup să încerce să-l rezolve din nou
+  define: {
+    'process.env': {},
+  },
+  resolve: {
+    alias: {
+      stream: 'stream-browserify',
+      buffer: 'buffer',
+      process: 'process/browser',
     },
   },
 });
-
