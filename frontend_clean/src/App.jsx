@@ -9,6 +9,8 @@ import {
 import PhantomLogo from './Phantom.svg';
 import NrgLogo from './assets/nrg-logo.svg'; // ✅ nou
 
+const API_URL = "https://predict-backend-kgzm.onrender.com"; // 🔁 NOU
+
 const App = () => {
   const [wallet, setWallet] = useState(null);
   const [symbol, setSymbol] = useState('');
@@ -21,12 +23,12 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8000/symbols")
+    fetch(`${API_URL}/symbols`)
       .then(res => res.json())
       .then(data => {
         setAvailableSymbols(data.symbols);
         console.log("🔁 Symbols from backend:", data.symbols);
-    document.title = "NRG AI Crypto Predictor";
+        document.title = "NRG AI Crypto Predictor";
       })
       .catch(err => {
         console.error("❌ Eroare la symbols:", err);
@@ -63,7 +65,7 @@ const App = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/predict-lstm', {
+      const res = await fetch(`${API_URL}/predict-lstm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ wallet: wallet || 'anonymous_user', symbol, days }),
@@ -138,7 +140,7 @@ const App = () => {
       setPredictionCount(0);
       setShowBuyMenu(false);
 
-      await fetch("http://localhost:8000/reset-usage", {
+      await fetch(`${API_URL}/reset-usage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ wallet, newLimit: amount }),
