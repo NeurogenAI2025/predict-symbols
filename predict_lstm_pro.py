@@ -56,6 +56,11 @@ def predict(symbol: str, wallet: str, days: int):
     symbol = symbol.lower()
     wallet = wallet.lower()
 
+    # Verificare limită pentru utilizatori anonimi
+    if wallet == "anonymous_user":
+        if wallet_usage[wallet]['used'] >= wallet_usage[wallet]['limit']:
+            raise HTTPException(status_code=403, detail="Free predictions exhausted. Please upgrade.")
+
     model_path = MODELS_DIR / f"{symbol}_lstm_model.keras"
     scaler_path = SCALERS_DIR / f"{symbol}_lstm_scaler.save"
     data_path = DATA_DIR / f"{symbol}.csv"
@@ -115,9 +120,8 @@ def predict(symbol: str, wallet: str, days: int):
 
         if wallet != "anonymous_user":
             save_to_purchased(wallet, symbol, predictions)
-
         else:
-            wallet_usage[wallet]['used'] += 1
+            wallet_usage[wallet]['used'] += 1  # ✅ actualizăm doar după succes
 
         save_predictions_to_csv(symbol, predictions)
 
