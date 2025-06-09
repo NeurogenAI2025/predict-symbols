@@ -1,14 +1,15 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+kimport { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: {
-    include: ["@solana/web3.js"],
+    include: ['@solana/web3.js'], // 👉 spune Vite să preproceseze acest modul
   },
-  resolve: {
-    alias: {
-      "@solana/web3.js": "node_modules/@solana/web3.js",
+  build: {
+    rollupOptions: {
+      external: ['@solana/web3.js'], // 👉 împiedică Rollup să încerce să-l rezolve din nou
     },
   },
 });
+
